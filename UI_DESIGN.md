@@ -101,6 +101,65 @@ className="bg-white text-black"
 className="bg-white/5 text-secondary hover:bg-white/10"
 ```
 
+**Navigation Button (Leaderboard):**
+```tsx
+// Prominent white border and text
+className="px-4 py-2 text-sm text-white font-medium border-2 border-white/40 rounded-lg hover:border-white/60 hover:bg-white/5 transition-all"
+```
+
+### Tooltips
+
+**Info Tooltip Component:**
+```tsx
+// Container with hover state
+<div onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+  {children}
+  <span className="text-white/40 text-xs cursor-help">ⓘ</span>
+
+  // Tooltip popup (shown on hover)
+  {show && (
+    <div className="absolute left-0 bottom-full mb-2 w-56 p-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-xs text-white/90 z-10">
+      {text}
+    </div>
+  )}
+</div>
+```
+
+**Usage:**
+- Appears on hover over ⓘ icon
+- Glassmorphism style with backdrop blur
+- Positioned above element to avoid covering content
+- Used on all 5 metrics to explain what they measure
+
+### External Links
+
+**X/Twitter Profile Links:**
+```tsx
+// On profile cards (standalone link)
+<a
+  href={`https://x.com/${username}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-white/60 hover:text-white transition-colors"
+  title="View on X"
+>
+  <span className="text-sm">𝕏</span>
+</a>
+
+// On leaderboard (button to avoid nested anchor)
+<button
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(`https://x.com/${username}`, '_blank', 'noopener,noreferrer');
+  }}
+  className="text-white/60 hover:text-white transition-colors"
+  title="View on X"
+>
+  <span className="text-sm">𝕏</span>
+</button>
+```
+
 ### Cards
 
 **Result Card:**

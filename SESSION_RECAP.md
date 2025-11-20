@@ -219,8 +219,73 @@ className="text-xs font-bold text-black drop-shadow-[0_1px_1px_rgba(255,255,255,
 
 ---
 
+## 7. Deployment & Final UI Polish
+
+### Vercel Deployment:
+**TypeScript Fixes:**
+- Added `RapidAPITweet` interface for proper type safety in `lib/twitter-scraper-rapidapi.ts`
+- Replaced `any` types with proper interfaces (lines 100, 102, 115)
+- Fixed error handling to use `unknown` instead of `any`
+- Resolved ESLint build errors blocking Vercel deployment
+
+**Environment Variables Setup:**
+- Configured all required env vars in Vercel dashboard
+- Fixed typo: `NEXT_PUBLIC_SUPABASE_UR` → `NEXT_PUBLIC_SUPABASE_URL`
+- Successfully deployed to production
+
+### UI Enhancements:
+
+**Prominent Leaderboard Button:**
+- Changed from subtle gray text to white text with medium font weight
+- Increased border thickness: `border-2 border-white/40`
+- Added enhanced hover states: `hover:border-white/60 hover:bg-white/5`
+- Makes navigation more discoverable
+
+**Metric Tooltips:**
+- Added hover tooltips to all 5 metrics (Ego, Value, Main Character, Humble Brag, Self Promotion)
+- Clean ⓘ info icon next to each metric label
+- Glassmorphism tooltip design: `bg-white/10 backdrop-blur-md border border-white/20`
+- Positioned above metrics to avoid covering content
+- Explanations help users understand what each score measures
+
+**X/Twitter Profile Links:**
+- Added 𝕏 logo link next to usernames on both profile cards and leaderboard
+- Opens Twitter profiles in new tab
+- Subtle styling: `text-white/60 hover:text-white`
+- On leaderboard: used `<button>` instead of `<a>` to avoid nested anchor tag error
+- Implements `stopPropagation` so clicking X doesn't navigate to profile page
+
+### Files Updated:
+1. **`lib/twitter-scraper-rapidapi.ts`** - TypeScript fixes for deployment
+2. **`app/page.tsx`** - Enhanced leaderboard button styling
+3. **`app/components/ResultCard.tsx`** - Added tooltips and X link
+4. **`app/leaderboard/page.tsx`** - Added X link with button (not anchor)
+
+### Technical Details:
+**Tooltip Component:**
+```typescript
+function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      {children}
+      <span className="text-white/40 text-xs cursor-help">ⓘ</span>
+      {show && <div className="absolute...">{text}</div>}
+    </div>
+  );
+}
+```
+
+**X Link Implementation:**
+- Profile cards: Standard `<a>` tag (not nested)
+- Leaderboard: `<button onClick={() => window.open(...)}>` to avoid hydration error
+
+---
+
 ## Next Steps / Future Improvements:
 - Share to X functionality (currently shows alert)
 - Industry filter UI on leaderboard
 - Performance optimizations
 - Mobile responsiveness testing
+- Add more profiles to leaderboard
