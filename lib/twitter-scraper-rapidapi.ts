@@ -11,6 +11,26 @@ interface RapidAPIConfig {
   apiHost: string; // e.g., 'twitter241.p.rapidapi.com' or 'twitter-api45.p.rapidapi.com'
 }
 
+interface RapidAPITweet {
+  tweet_id?: string;
+  id_str?: string;
+  id?: string;
+  text?: string;
+  full_text?: string;
+  creation_date?: string;
+  created_at?: string;
+  retweet_count?: number;
+  favorite_count?: number;
+  like_count?: number;
+  reply_count?: number;
+  quote_count?: number;
+  retweeted?: boolean;
+  is_retweet?: boolean;
+  in_reply_to_user_id?: string;
+  reply_to?: string;
+  is_reply?: boolean;
+}
+
 /**
  * Scrape Twitter using RapidAPI
  */
@@ -97,9 +117,9 @@ export async function scrapeTwitterRapidAPI(
     console.log(`Processing ${tweetsArray.length} tweets from API response`);
 
     const tweets: Tweet[] = tweetsArray
-      .filter((t: any) => t && (t.text || t.full_text) && !t.retweeted) // Filter out retweets
+      .filter((t: RapidAPITweet) => t && (t.text || t.full_text) && !t.retweeted) // Filter out retweets
       .slice(0, maxTweets)
-      .map((t: any) => ({
+      .map((t: RapidAPITweet) => ({
         id: t.tweet_id || t.id_str || t.id || String(Date.now()),
         text: t.text || t.full_text || '',
         created_at: t.creation_date || t.created_at || new Date().toISOString(),
@@ -112,9 +132,13 @@ export async function scrapeTwitterRapidAPI(
       }));
 
     return { profile, tweets };
-  } catch (error: any) {
-    console.error('RapidAPI scraping error:', error.response?.data || error.message);
-    throw new Error(`Failed to scrape Twitter via RapidAPI: ${error.message}`);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorResponse = error && typeof error === 'object' && 'response' in error
+      ? (error as { response?: { data?: unknown } }).response?.data
+      : undefined;
+    console.error('RapidAPI scraping error:', errorResponse || errorMessage);
+    throw new Error(`Failed to scrape Twitter via RapidAPI: ${errorMessage}`);
   }
 }
 
