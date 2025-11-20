@@ -25,7 +25,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex justify-end">
           <Link
             href="/leaderboard"
-            className="px-4 py-2 text-sm text-secondary hover:text-foreground border border-white/10 rounded-lg hover:border-white/20 transition-all"
+            className="px-4 py-2 text-sm text-white font-medium border-2 border-white/40 rounded-lg hover:border-white/60 hover:bg-white/5 transition-all"
           >
             Leaderboard
           </Link>

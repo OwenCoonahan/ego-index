@@ -165,7 +165,20 @@ export default function LeaderboardPage() {
                       <p className={`font-bold ${isTopThree ? 'text-lg' : 'text-base'} text-foreground`}>
                         {entry.displayName}
                       </p>
-                      <p className="text-sm text-secondary">@{entry.username}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-secondary">@{entry.username}</p>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(`https://x.com/${entry.username}`, '_blank', 'noopener,noreferrer');
+                          }}
+                          className="text-white/60 hover:text-white transition-colors"
+                          title="View on X"
+                        >
+                          <span className="text-sm">𝕏</span>
+                        </button>
+                      </div>
                       {entry.industry && (
                         <p className="text-xs text-secondary mt-1">{entry.industry}</p>
                       )}

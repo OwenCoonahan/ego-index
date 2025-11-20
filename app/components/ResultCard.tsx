@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface ResultCardProps {
   username: string;
@@ -14,6 +15,27 @@ interface ResultCardProps {
   selfPromotionScore: number;
   tier: string;
   tierEmoji: string;
+}
+
+// Tooltip component
+function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div
+      className="relative inline-flex items-center gap-1"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      <span className="text-white/40 text-xs cursor-help">ⓘ</span>
+      {show && (
+        <div className="absolute left-0 bottom-full mb-2 w-56 p-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-xs text-white/90 leading-relaxed z-10 pointer-events-none">
+          {text}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ResultCard({
@@ -73,7 +95,18 @@ export default function ResultCard({
               />
               <div>
                 <p className="font-bold text-foreground">{displayName}</p>
-                <p className="text-sm text-secondary">@{username}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-secondary">@{username}</p>
+                  <a
+                    href={`https://x.com/${username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/60 hover:text-white transition-colors"
+                    title="View on X"
+                  >
+                    <span className="text-sm">𝕏</span>
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -101,23 +134,33 @@ export default function ResultCard({
             {/* Individual Scores */}
             <div className="space-y-2.5 mb-6">
               <div className="flex justify-between items-center">
-                <span className="text-secondary text-sm">🎭 Ego</span>
+                <Tooltip text="How much content is focused on yourself vs. providing value to others. Higher = more self-focused.">
+                  <span className="text-secondary text-sm">🎭 Ego</span>
+                </Tooltip>
                 <span className="font-bold text-foreground">{egoScore}/100</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-secondary text-sm">💎 Value</span>
+                <Tooltip text="How much actionable, educational, or useful content you provide. Higher = more valuable to your audience.">
+                  <span className="text-secondary text-sm">💎 Value</span>
+                </Tooltip>
                 <span className="font-bold text-foreground">{valueScore}/100</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-secondary text-sm">🎬 Main Character</span>
+                <Tooltip text="Tendency to make everything about you or be the center of attention. Higher = more main character energy.">
+                  <span className="text-secondary text-sm">🎬 Main Character</span>
+                </Tooltip>
                 <span className="font-bold text-foreground">{mainCharacterScore}/100</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-secondary text-sm">😇 Humble Brag</span>
+                <Tooltip text="Subtle self-promotion disguised as modesty or complaints. Higher = more humble bragging.">
+                  <span className="text-secondary text-sm">😇 Humble Brag</span>
+                </Tooltip>
                 <span className="font-bold text-foreground">{humbleBragScore}/100</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-secondary text-sm">📣 Self Promotion</span>
+                <Tooltip text="How often you promote your own products, services, or achievements. Higher = more promotional content.">
+                  <span className="text-secondary text-sm">📣 Self Promotion</span>
+                </Tooltip>
                 <span className="font-bold text-foreground">{selfPromotionScore}/100</span>
               </div>
             </div>
