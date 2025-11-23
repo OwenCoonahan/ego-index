@@ -43,9 +43,13 @@ export async function GET(request: NextRequest) {
       // Map UI categories to database patterns
       const industryPatterns: Record<string, string[]> = {
         'Tech/Startup Founder': ['tech', 'startup', 'founder'],
+        'Indie Hackers': ['indie', 'maker', 'solo', 'bootstrapped'],
         'Developer/Engineer': ['developer', 'engineer', 'software'],
+        'AI/ML Researchers': ['ai', 'ml', 'research', 'academic', 'scientist'],
         'Investor/VC': ['investor', 'vc'],
-        'Creator/Influencer': ['creator', 'influencer', 'writer', 'content'],
+        'Creator/Influencer': ['creator', 'influencer', 'content'],
+        'Journalists/Writers': ['journalist', 'writer', 'author'],
+        'Designers': ['design', 'visual'],
         'Crypto/Web3': ['crypto', 'nft', 'web3'],
       };
 

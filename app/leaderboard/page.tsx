@@ -148,7 +148,7 @@ export default function LeaderboardPage() {
 
           {/* Industry filters */}
           <div className="flex flex-wrap gap-2 justify-center">
-            {['all', 'Tech/Startup Founder', 'Developer/Engineer', 'Investor/VC', 'Creator/Influencer', 'Crypto/Web3'].map((ind) => (
+            {['all', 'Tech/Startup Founder', 'Indie Hackers', 'Developer/Engineer', 'AI/ML Researchers', 'Investor/VC', 'Creator/Influencer', 'Journalists/Writers', 'Designers', 'Crypto/Web3'].map((ind) => (
               <button
                 key={ind}
                 onClick={() => setIndustryFilter(ind)}

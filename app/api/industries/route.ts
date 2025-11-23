@@ -33,10 +33,23 @@ export async function GET() {
         i.name.toLowerCase().includes('startup') ||
         i.name.toLowerCase().includes('founder')
       ),
+      'Indie Hackers': industries.filter(i =>
+        i.name.toLowerCase().includes('indie') ||
+        i.name.toLowerCase().includes('maker') ||
+        i.name.toLowerCase().includes('solo') ||
+        i.name.toLowerCase().includes('bootstrapped')
+      ),
       'Developer/Engineer': industries.filter(i =>
         i.name.toLowerCase().includes('developer') ||
         i.name.toLowerCase().includes('engineer') ||
         i.name.toLowerCase().includes('software')
+      ),
+      'AI/ML Researchers': industries.filter(i =>
+        i.name.toLowerCase().includes('ai') ||
+        i.name.toLowerCase().includes('ml') ||
+        i.name.toLowerCase().includes('research') ||
+        i.name.toLowerCase().includes('academic') ||
+        i.name.toLowerCase().includes('scientist')
       ),
       'Investor/VC': industries.filter(i =>
         i.name.toLowerCase().includes('investor') ||
@@ -45,8 +58,16 @@ export async function GET() {
       'Creator/Influencer': industries.filter(i =>
         i.name.toLowerCase().includes('creator') ||
         i.name.toLowerCase().includes('influencer') ||
-        i.name.toLowerCase().includes('writer') ||
         i.name.toLowerCase().includes('content')
+      ),
+      'Journalists/Writers': industries.filter(i =>
+        i.name.toLowerCase().includes('journalist') ||
+        i.name.toLowerCase().includes('writer') ||
+        i.name.toLowerCase().includes('author')
+      ),
+      'Designers': industries.filter(i =>
+        i.name.toLowerCase().includes('design') ||
+        i.name.toLowerCase().includes('visual')
       ),
       'Crypto/Web3': industries.filter(i =>
         i.name.toLowerCase().includes('crypto') ||
