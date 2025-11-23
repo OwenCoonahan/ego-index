@@ -12,11 +12,11 @@
  */
 
 const DELAY_BETWEEN_ACCOUNTS = 8000; // 8 seconds between accounts to be respectful
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3002';
 
-// Curated list of interesting accounts across different categories
+// Curated list of interesting accounts across different categories (100+ accounts)
 const CURATED_ACCOUNTS = [
-  // Tech Founders & CEOs (likely high ego potential)
+  // === TECH FOUNDERS & CEOs === (likely high ego potential)
   'elonmusk',      // Tesla, SpaceX - known for main character energy
   'pmarca',        // Marc Andreessen - a16z cofounder
   'sama',          // Sam Altman - OpenAI
@@ -25,51 +25,119 @@ const CURATED_ACCOUNTS = [
   'naval',         // Naval Ravikant - philosopher founder
   'patrick_oshag', // Patrick O'Shaughnessy - O'Shaughnessy Ventures
   'shaanvp',       // Shaan Puri - My First Million
+  'tobi',          // Tobi Lutke - Shopify CEO
+  'adamdangelo',   // Adam D'Angelo - Quora CEO
+  'biz',           // Biz Stone - Twitter cofounder
+  'ev',            // Ev Williams - Medium founder
 
-  // VCs & Investors
+  // === VCs & INVESTORS ===
   'chamath',       // Chamath Palihapitiya
   'jason',         // Jason Calacanis
   'garrytan',      // Garry Tan - YC
   'alexisohanian', // Alexis Ohanian - Reddit cofounder
   'balajis',       // Balaji Srinivasan
+  'bhorowitz',     // Ben Horowitz - a16z
+  'eladgil',       // Elad Gil
+  'sriramk',       // Sriram Krishnan
+  'jaltma',        // Jill Carlson
+  'ljin18',        // Li Jin - Variant Fund
 
-  // Tech Twitter personalities
+  // === TECH TWITTER PERSONALITIES ===
   'paulg',         // Paul Graham - YC founder
   'shreyas',       // Shreyas Doshi - product leader
   'lennysan',      // Lenny Rachitsky
   'andrewchen',    // Andrew Chen - a16z
   'agazdecki',     // Andrew Gazdecki - Acquire.com
   'swyx',          // Shawn Wang - dev influencer
+  'GergelyOrosz',  // Gergely Orosz - Pragmatic Engineer
+  'joulee',        // Julie Zhuo - product leader
+  'bbalfour',      // Brian Balfour - Reforge
 
-  // Developer Twitter
+  // === DEVELOPER TWITTER ===
   'thorstenball',  // Thorsten Ball - author
   'kentcdodds',    // Kent C. Dodds
   'wesbos',        // Wes Bos
   'addyosmani',    // Addy Osmani - Google
   'tj_holowaychuk',// TJ Holowaychuk
+  'jesslynnrose',  // Jess Rose - developer advocate
+  'sarah_edo',     // Sarah Drasner
+  'dan_abramov',   // Dan Abramov - React
+  'sebmarkbage',   // Sebastian Markbåge - React
+  'ThePrimeagen',  // ThePrimeagen - Twitch dev
+  'cassidoo',      // Cassidy Williams
 
-  // Crypto/Web3 (high ego category)
+  // === AI/ML RESEARCHERS & BUILDERS ===
+  'ylecun',        // Yann LeCun - Meta AI
+  'AndrewYNg',     // Andrew Ng
+  'karpathy',      // Andrej Karpathy
+  'fchollet',      // François Chollet - Keras
+  '_akhaliq',      // AK - Papers with Code
+  'hardmaru',      // David Ha
+  'poolio',        // Nicolas Cage (AI researcher)
+  'alexjc',        // Alex J. Champandard
+
+  // === CRYPTO/WEB3 ===
   'vitalikbuterin',// Vitalik Buterin
   'punk6529',      // 6529
   'cobie',         // Cobie
+  'sassal0x',      // Sassal
+  'DCinvestor',    // DC Investor
+  'evan_van_ness', // Evan Van Ness
+  'hasufl',        // Hasu
+  'tayvano_',      // Taylor Monahan - MyCrypto
+  'RyanSAdams',    // Ryan Sean Adams - Bankless
+  'santiagoroel',  // Santiago Santos
 
-  // Content creators & educators
+  // === INDIE HACKERS ===
+  'yongfook',      // Jon Yongfook
+  'marc_louvion',  // Marc Louvion
+  'tdinh_me',      // Tony Dinh
+  'dannypostmaa',  // Danny Postma
+  'heyrobinpayeur',// Robin Payeur
+  'Dagobert_Renouf',// Dagobert Renouf
+  'marc_louvion',  // Marc Louvion
+  'dagorenouf',    // Dago Renouf
+
+  // === CONTENT CREATORS & EDUCATORS ===
   'thealexbanks',  // Alex Banks
   'dickiebush',    // Dickie Bush - Ship 30 for 30
   'jackbutcher',   // Jack Butcher - Visualize Value
   'anthilemoon',   // Anne-Laure Le Cunff - Ness Labs
+  'dvassallo',     // Daniel Vassallo
+  'arvidkahl',     // Arvid Kahl
+  'MeetKevon',     // Kevon Cheung
 
-  // Contrarian/spicy accounts
+  // === DESIGNERS ===
+  'pablostanley',  // Pablo Stanley
+  'tobiasvanschneider', // Tobias van Schneider
+  'jongold',       // Jon Gold
+  'jessicahische', // Jessica Hische
+  'danmall',       // Dan Mall
+  'chriscoyier',   // Chris Coyier
+
+  // === JOURNALISTS & WRITERS ===
+  'benthompson',   // Ben Thompson - Stratechery
+  'caseynewton',   // Casey Newton - Platformer
+  'daringfireball',// John Gruber - Daring Fireball
+  'mgsiegler',     // MG Siegler
+  'Om',            // Om Malik
+  'pariss',        // Paris Martineau
+  'alexeheath',    // Alex Heath - The Verge
+
+  // === CONTRARIAN/SPICY ACCOUNTS ===
   'waitbutwhy',    // Tim Urban
   'APompliano',    // Anthony Pompliano
   'david_perell',  // David Perell
   'nntaleb',       // Nassim Taleb - known for ego
+  'naval',         // Naval - philosophical
 
-  // Some more humble/value-focused accounts for balance
+  // === HUMBLE/VALUE-FOCUSED (for balance) ===
   'simonw',        // Simon Willison - Django creator
   'b0rk',          // Julia Evans - zines
   'kelseyhightower', // Kelsey Hightower
   'mipsytipsy',    // Charity Majors
+  'jdan',          // Jordan Scales
+  'tjholowaychuk', // TJ Holowaychuk
 ];
 
 interface ImportResult {

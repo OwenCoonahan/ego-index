@@ -38,9 +38,28 @@ export async function GET(request: NextRequest) {
       `)
       .limit(limit);
 
-    // Apply industry filter
+    // Apply industry filter with fuzzy matching for grouped categories
     if (industry !== 'all') {
-      query = query.eq('industry', industry);
+      // Map UI categories to database patterns
+      const industryPatterns: Record<string, string[]> = {
+        'Tech/Startup Founder': ['tech', 'startup', 'founder'],
+        'Developer/Engineer': ['developer', 'engineer', 'software'],
+        'Investor/VC': ['investor', 'vc'],
+        'Creator/Influencer': ['creator', 'influencer', 'writer', 'content'],
+        'Crypto/Web3': ['crypto', 'nft', 'web3'],
+      };
+
+      const patterns = industryPatterns[industry];
+      if (patterns) {
+        // Use OR logic to match any of the patterns
+        const orConditions = patterns.map(pattern =>
+          `industry.ilike.%${pattern}%`
+        ).join(',');
+        query = query.or(orConditions);
+      } else {
+        // Exact match for other categories
+        query = query.eq('industry', industry);
+      }
     }
 
     // Apply sorting based on filter
