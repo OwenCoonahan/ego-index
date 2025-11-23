@@ -12,6 +12,10 @@ const config: Config = {
         background: "#0A0A0A",
         foreground: "#F5F5F5",
         secondary: "#A0A0A0",
+        border: {
+          DEFAULT: "rgba(255, 255, 255, 0.1)",
+          hover: "rgba(255, 255, 255, 0.2)",
+        },
       },
       backgroundImage: {
         // Heat map progression: green → yellow → orange → red
@@ -27,7 +31,12 @@ const config: Config = {
         'gradient-balanced': 'linear-gradient(135deg, #FBBF24 0%, #FCD34D 100%)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-geist-sans)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        mono: ['var(--font-geist-mono)', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
+      },
+      boxShadow: {
+        'glow': '0 0 20px rgba(255, 255, 255, 0.1)',
+        'glow-lg': '0 0 30px rgba(255, 255, 255, 0.15)',
       },
     },
   },

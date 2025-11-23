@@ -6,7 +6,15 @@ export interface EgoAnalysis {
   // Core scores (0-100)
   egoScore: number;
   valueScore: number;
-  overallScore: number;
+  overallScore: number; // Legacy - for backward compatibility
+
+  // Multi-dimensional scores (NEW)
+  noiseScore: number; // Platitudes, engagement farming, low-value content
+  engagementQualityScore: number; // Quality of interactions
+  authenticityScore: number; // Consistency, genuine expertise
+
+  // Composite metric (0.00-1.00)
+  signalToEgoRatio: number; // SER = Value / (Ego + Noise + 1)
 
   // Detailed metrics
   mainCharacterScore: number;
@@ -33,28 +41,42 @@ export interface EgoAnalysis {
     text: string;
     score: number;
   } | null;
+
+  mostValuableTweet: {
+    id: string;
+    text: string;
+    score: number;
+  } | null;
 }
 
-// Tiers based on Overall Score (higher score = higher ego = worse)
-// Heat map progression: green → lime → yellow → orange → red
-const TIERS = [
-  { min: 0, max: 20, name: "Selfless Teacher", emoji: "🎓", description: "Pure value, zero ego", color: "green" },
-  { min: 21, max: 40, name: "Value Contributor", emoji: "💎", description: "Lots of value, light on ego", color: "lime" },
-  { min: 41, max: 60, name: "Balanced Creator", emoji: "⚖️", description: "Good mix of personality and value", color: "yellow" },
-  { min: 61, max: 80, name: "Self-Promoter", emoji: "📢", description: "Heavy self-focus with some value", color: "orange" },
-  { min: 81, max: 100, name: "Ego Maximalist", emoji: "🔥", description: "All ego, minimal value", color: "red" },
+// Tiers based on Signal-to-Ego Ratio (SER)
+// Higher SER = better (more value, less ego/noise)
+const SER_TIERS = [
+  { min: 0.80, max: 1.00, name: "Elite Value Provider", emoji: "🏆", description: "Top 5% - Pure signal, minimal noise", color: "green" },
+  { min: 0.60, max: 0.79, name: "High Value Contributor", emoji: "💎", description: "Top 20% - Strong signal-to-noise ratio", color: "lime" },
+  { min: 0.40, max: 0.59, name: "Balanced Creator", emoji: "⚖️", description: "Good mix of value and personality", color: "yellow" },
+  { min: 0.20, max: 0.39, name: "Low Signal Account", emoji: "📢", description: "More noise than value", color: "orange" },
+  { min: 0.00, max: 0.19, name: "Noise Account", emoji: "🔥", description: "Minimal value, high ego/noise", color: "red" },
 ];
 
-function getTier(score: number): { name: string; emoji: string } {
-  const tier = TIERS.find(t => score >= t.min && score <= t.max);
-  return tier ? { name: tier.name, emoji: tier.emoji } : TIERS[2];
+function getTierFromSER(ser: number): { name: string; emoji: string } {
+  const tier = SER_TIERS.find(t => ser >= t.min && ser <= t.max);
+  return tier ? { name: tier.name, emoji: tier.emoji } : SER_TIERS[2];
 }
 
-const ANALYSIS_PROMPT = `You are an expert at analyzing social media content for ego and value signals.
+// Legacy tier function for backward compatibility
+function getTier(score: number): { name: string; emoji: string } {
+  // Map old overall score (0-100, higher is worse) to approximate SER
+  const approximateSER = (100 - score) / 100;
+  return getTierFromSER(approximateSER);
+}
 
-Your task is to analyze a Twitter/X profile and their recent tweets to determine their "Ego Index" - a measure of ego-to-value ratio.
+const ANALYSIS_PROMPT = `You are an expert at analyzing social media content for ego, value, and noise signals.
 
-**Ego Signals (what to look for):**
+Your task is to analyze a Twitter/X profile and their recent tweets across MULTIPLE DIMENSIONS to determine their content quality.
+
+**DIMENSION 1: Ego Score (0-100)**
+How self-centered is the content?
 - Excessive use of "I", "me", "my"
 - Humble brags ("just casually closed a 7-figure deal")
 - Talking about achievements without context or value
@@ -63,25 +85,68 @@ Your task is to analyze a Twitter/X profile and their recent tweets to determine
 - Screenshots of compliments/DMs
 - Constant self-promotion without substance
 - Reply-guy behavior with famous people
-- Posting photos at fancy places/events just to flex
+- Flexing (photos at fancy places/events just to show off)
+Score: 0 = selfless, 100 = pure narcissism
 
-**Value Signals (what to look for):**
+**DIMENSION 2: Value Score (0-100)**
+How much actionable value do they provide?
 - Sharing actionable advice, tips, tutorials
-- Helping others solve problems
-- Asking questions and engaging meaningfully
-- Sharing knowledge without expecting praise
+- Helping others solve specific problems
+- Sharing genuine expertise and insights
+- Teaching/educating their audience
 - Promoting others' work
-- Thoughtful commentary on topics
-- Educational threads/content
+- Thoughtful commentary that adds new perspectives
 - Vulnerable/authentic sharing that helps others
+- Original ideas and frameworks
+Score: 0 = zero value, 100 = extremely valuable
 
-**Scoring Guidelines:**
-- Ego Score (0-100): How self-centered is the content? 0 = selfless, 100 = pure narcissism
-- Value Score (0-100): How much actionable value do they provide? 0 = none, 100 = extremely valuable
-- Overall Score (0-100): The EGO INDEX - measures how egotistical they are. HIGH score = high ego + low value (bad). LOW score = low ego + high value (good). Calculate as: (egoScore + (100 - valueScore)) / 2
+**DIMENSION 3: Noise Score (0-100) - NEW**
+How much low-value, generic content?
+- Platitudes ("Just shipped!", "LFG!", "GM", "WAGMI")
+- Obvious takes everyone agrees with ("Hard work pays off")
+- Engagement farming ("Tag someone who needs to hear this")
+- Generic motivational quotes
+- Rage bait without substance
+- Talking ABOUT shipping instead of actually sharing what was shipped
+- Performative posting (pretending to care about trending topics)
+- Recycling common takes without adding value
+Score: 0 = zero noise, 100 = pure noise
+
+**DIMENSION 4: Engagement Quality Score (0-100) - NEW**
+Quality of their interactions
+- Meaningful replies that add to conversations (HIGH)
+- Thoughtful questions that spark discussion (HIGH)
+- Building on others' ideas constructively (HIGH)
+- Genuine dialogue and back-and-forth (HIGH)
+VS
+- Drive-by quote tweets for dunks (LOW)
+- Performative replies to famous people (LOW)
+- Generic "great post!" comments (LOW)
+- One-word replies or emoji spam (LOW)
+Score: 0 = low quality engagement, 100 = exceptional engagement quality
+
+**DIMENSION 5: Authenticity Score (0-100) - NEW**
+How genuine and consistent are they?
+- Expertise matches their content (consistent topic focus)
+- Walking the talk (shipping, not just talking about shipping)
+- Genuine expertise shown through depth
+- Consistent voice and values
+- Not jumping on every trend
+- Admitting mistakes and showing growth
+VS
+- Surface-level commentary on everything
+- Constant topic-hopping to chase engagement
+- Claiming expertise without demonstrating it
+- Contradicting themselves frequently
+Score: 0 = performative/inconsistent, 100 = highly authentic
+
+**Additional Metrics:**
+- Main Character Score (0-100): Do they act like everything revolves around them?
+- Humble Brag Score (0-100): How often do they humble brag?
+- Self Promotion Score (0-100): How much do they promote themselves?
 
 **Industry Classification:**
-Look at their bio and tweets to classify them into one of these industries:
+Look at their bio and tweets to classify them:
 - Tech/Startup Founder
 - Software Developer
 - Designer
@@ -92,49 +157,80 @@ Look at their bio and tweets to classify them into one of these industries:
 - Consultant
 - Other
 
-Analyze the profile and tweets provided, then return your analysis in the following JSON format:
+**Tweet Highlights:**
+Identify:
+1. Most egotistical tweet (highest ego signals)
+2. Least egotistical tweet (lowest ego, or most value)
+3. Most valuable tweet (highest value score, most helpful)
+
+Return your analysis in this JSON format:
 
 {
   "egoScore": <number 0-100>,
   "valueScore": <number 0-100>,
-  "overallScore": <number 0-100>,
+  "noiseScore": <number 0-100>,
+  "engagementQualityScore": <number 0-100>,
+  "authenticityScore": <number 0-100>,
+  "overallScore": <number 0-100, calculated as (egoScore + (100 - valueScore)) / 2>,
   "mainCharacterScore": <number 0-100>,
   "humbleBragScore": <number 0-100>,
   "selfPromotionScore": <number 0-100>,
   "industry": "<industry string>",
-  "summary": "<2-3 sentence summary of their social media presence>",
-  "mostEgotisticalTweetId": "<tweet id>",
+  "summary": "<2-3 sentence summary of their social media presence, mention their SER tier>",
+  "mostEgotisticalTweetId": "<tweet index>",
   "mostEgotisticalTweetExplanation": "<why this tweet is egotistical>",
-  "leastEgotisticalTweetId": "<tweet id>",
-  "leastEgotisticalTweetExplanation": "<why this tweet provides value>"
+  "leastEgotisticalTweetId": "<tweet index>",
+  "leastEgotisticalTweetExplanation": "<why this tweet is valuable or low-ego>",
+  "mostValuableTweetId": "<tweet index>",
+  "mostValuableTweetExplanation": "<why this tweet provides the most value>"
 }
 
 Be honest, direct, and a bit cheeky in your analysis. This is meant to be fun but insightful.`;
 
 /**
- * Analyze ego using OpenAI GPT-4o-mini or Gemini
+ * Calculate Signal-to-Ego Ratio (SER)
+ * Formula: Value / (Ego + Noise + 1)
+ * Range: 0.00 to 1.00 (normalized)
  */
+function calculateSER(valueScore: number, egoScore: number, noiseScore: number): number {
+  const denominator = egoScore + noiseScore + 1;
+  const rawSER = valueScore / denominator;
+  // Normalize to 0-1 range (cap at 1.0)
+  return Math.min(Math.round(rawSER * 100) / 100, 1.0);
+}
+
 /**
  * Generate mock analysis for testing
  */
 function getMockAnalysis(profile: TwitterProfile, tweets: Tweet[]): EgoAnalysis {
-  const egoScore = 65;
-  const valueScore = 55;
+  const egoScore = 45;
+  const valueScore = 65;
+  const noiseScore = 35;
+  const engagementQualityScore = 60;
+  const authenticityScore = 70;
+
   // Overall score = (ego + (100 - value)) / 2 → higher ego + lower value = higher score
   const overallScore = Math.round((egoScore + (100 - valueScore)) / 2);
-  const tier = getTier(overallScore);
+
+  // Calculate SER
+  const signalToEgoRatio = calculateSER(valueScore, egoScore, noiseScore);
+  const tier = getTierFromSER(signalToEgoRatio);
 
   return {
     egoScore,
     valueScore,
     overallScore,
-    mainCharacterScore: 70,
-    humbleBragScore: 60,
-    selfPromotionScore: 65,
+    noiseScore,
+    engagementQualityScore,
+    authenticityScore,
+    signalToEgoRatio,
+    mainCharacterScore: 50,
+    humbleBragScore: 40,
+    selfPromotionScore: 45,
     industry: "Tech/Startup Founder",
     tier: tier.name,
     tierEmoji: tier.emoji,
-    summary: `${profile.display_name} shows a balanced mix of self-promotion and value-sharing. They're not afraid to celebrate their wins (sometimes a bit too enthusiastically), but also contribute helpful insights to their community. Classic founder energy.`,
+    summary: `${profile.display_name} shows a good balance of self-promotion and value-sharing. With a Signal-to-Ego Ratio of ${signalToEgoRatio.toFixed(2)}, they're a ${tier.name}. They contribute helpful insights while maintaining personality.`,
     mostEgotisticalTweet: tweets[0] ? {
       id: tweets[0].id,
       text: tweets[0].text,
@@ -144,6 +240,11 @@ function getMockAnalysis(profile: TwitterProfile, tweets: Tweet[]): EgoAnalysis 
       id: tweets[1].id,
       text: tweets[1].text,
       score: 25
+    } : null,
+    mostValuableTweet: tweets[2] ? {
+      id: tweets[2].id,
+      text: tweets[2].text,
+      score: 90
     } : null,
   };
 }
@@ -225,13 +326,26 @@ ${tweetTexts}
     // Find the actual tweets referenced
     const mostEgo = tweets[parseInt(result.mostEgotisticalTweetId)] || null;
     const leastEgo = tweets[parseInt(result.leastEgotisticalTweetId)] || null;
+    const mostValuable = tweets[parseInt(result.mostValuableTweetId)] || null;
 
-    const tier = getTier(result.overallScore);
+    // Calculate Signal-to-Ego Ratio
+    const signalToEgoRatio = calculateSER(
+      result.valueScore,
+      result.egoScore,
+      result.noiseScore
+    );
+
+    // Get tier based on SER
+    const tier = getTierFromSER(signalToEgoRatio);
 
     return {
       egoScore: result.egoScore,
       valueScore: result.valueScore,
       overallScore: result.overallScore,
+      noiseScore: result.noiseScore,
+      engagementQualityScore: result.engagementQualityScore,
+      authenticityScore: result.authenticityScore,
+      signalToEgoRatio,
       mainCharacterScore: result.mainCharacterScore,
       humbleBragScore: result.humbleBragScore,
       selfPromotionScore: result.selfPromotionScore,
@@ -248,6 +362,11 @@ ${tweetTexts}
         id: leastEgo.id,
         text: leastEgo.text,
         score: 100 - result.egoScore
+      } : null,
+      mostValuableTweet: mostValuable ? {
+        id: mostValuable.id,
+        text: mostValuable.text,
+        score: result.valueScore
       } : null,
     };
   } catch (error) {
