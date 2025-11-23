@@ -64,7 +64,8 @@ function getTierFromSER(ser: number): { name: string; emoji: string } {
   return tier ? { name: tier.name, emoji: tier.emoji } : SER_TIERS[2];
 }
 
-// Legacy tier function for backward compatibility
+// Legacy tier function for backward compatibility (kept for potential future use)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTier(score: number): { name: string; emoji: string } {
   // Map old overall score (0-100, higher is worse) to approximate SER
   const approximateSER = (100 - score) / 100;

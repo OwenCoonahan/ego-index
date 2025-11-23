@@ -1,8 +1,11 @@
 /**
  * Blocklist utilities for Ego Index
  * Prevents analysis of accounts that should not be stored
+ *
+ * NOTE: Requires running supabase-blocklist.sql first
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabaseAdmin } from './supabase';
 
 /**
@@ -10,7 +13,7 @@ import { supabaseAdmin } from './supabase';
  */
 export async function isBlocked(username: string): Promise<boolean> {
   const { data, error } = await supabaseAdmin
-    .from('blocklist')
+    .from('blocklist' as any)
     .select('username')
     .ilike('username', username)
     .single();
@@ -32,12 +35,12 @@ export async function blockUsername(
   notes?: string
 ): Promise<void> {
   const { error } = await supabaseAdmin
-    .from('blocklist')
+    .from('blocklist' as any)
     .insert({
       username: username.toLowerCase(),
       reason,
       notes,
-    });
+    } as any);
 
   if (error) {
     console.error('Error adding to blocklist:', error);
@@ -50,7 +53,7 @@ export async function blockUsername(
  */
 export async function unblockUsername(username: string): Promise<void> {
   const { error } = await supabaseAdmin
-    .from('blocklist')
+    .from('blocklist' as any)
     .delete()
     .ilike('username', username);
 
@@ -75,17 +78,19 @@ export async function deleteUserData(username: string): Promise<void> {
     return; // Already deleted
   }
 
+  const profileData = profile as any;
+
   // Delete analyses (will cascade due to foreign key)
   await supabaseAdmin
     .from('analyses')
     .delete()
-    .eq('profile_id', profile.id);
+    .eq('profile_id', profileData.id);
 
   // Delete profile
   await supabaseAdmin
     .from('profiles')
     .delete()
-    .eq('id', profile.id);
+    .eq('id', profileData.id);
 
   // Add to blocklist to prevent re-analysis
   await blockUsername(username, 'user_request', 'Requested data deletion');

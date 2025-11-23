@@ -10,11 +10,13 @@ interface ShareToTwitterProps {
   tier: string;
   tierEmoji: string;
   percentile?: number;
-  cardRef: React.RefObject<HTMLDivElement>;
+  cardRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export default function ShareToTwitter({
   username,
+  // displayName param available for future use
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   displayName,
   overallScore,
   tier,

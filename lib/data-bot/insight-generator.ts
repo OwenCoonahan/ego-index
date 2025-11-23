@@ -28,7 +28,16 @@ export async function findHighValueAccounts(limit: number = 10): Promise<Insight
 
   if (error) throw error;
 
-  const accounts = data as any[];
+  const accounts = data as Array<{
+    signal_to_ego_ratio: number;
+    value_score: number;
+    ego_score: number;
+    profiles: {
+      username: string;
+      display_name: string;
+      followers_count: number;
+    };
+  }>;
 
   return {
     type: 'high_value',
@@ -57,7 +66,14 @@ export async function generateIndustryComparison(industry: string): Promise<Insi
 
   if (error) throw error;
 
-  const analyses = data as any[];
+  const analyses = data as Array<{
+    ego_score: number;
+    value_score: number;
+    noise_score: number;
+    signal_to_ego_ratio: number;
+    industry: string;
+    profiles: { username: string; followers_count: number };
+  }>;
   const avgEgo = Math.round(analyses.reduce((sum, a) => sum + a.ego_score, 0) / analyses.length);
   const avgValue = Math.round(analyses.reduce((sum, a) => sum + a.value_score, 0) / analyses.length);
   const avgNoise = Math.round(analyses.reduce((sum, a) => sum + a.noise_score, 0) / analyses.length);
@@ -90,7 +106,14 @@ export async function detectPatterns(): Promise<InsightData> {
 
   if (error) throw error;
 
-  const analyses = data as any[];
+  const analyses = data as Array<{
+    ego_score: number;
+    value_score: number;
+    noise_score: number;
+    signal_to_ego_ratio: number;
+    industry: string;
+    profiles: { followers_count: number };
+  }>;
 
   // Pattern: Correlation between follower count and SER
   const highFollowers = analyses.filter(a => a.profiles.followers_count > 50000);
@@ -129,7 +152,11 @@ export async function generateWeeklyStats(): Promise<InsightData> {
 
   if (error) throw error;
 
-  const analyses = data as any[];
+  const analyses = data as Array<{
+    ego_score: number;
+    value_score: number;
+    signal_to_ego_ratio: number;
+  }>;
   const totalAnalyzed = analyses.length;
   const avgEgo = Math.round(analyses.reduce((sum, a) => sum + a.ego_score, 0) / analyses.length);
   const avgValue = Math.round(analyses.reduce((sum, a) => sum + a.value_score, 0) / analyses.length);
@@ -148,8 +175,10 @@ export async function generateWeeklyStats(): Promise<InsightData> {
 // TWEET GENERATORS
 // ============================================================================
 
-function generateHighValueTweet(accounts: any[]): string {
-  const handles = accounts.map(a => `@${a.profiles.username}`).join(', ');
+function generateHighValueTweet(accounts: Array<{
+  signal_to_ego_ratio: number;
+  profiles: { username: string };
+}>): string {
 
   return `🏆 Elite Value Providers This Week
 

@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
     const filter = searchParams.get('filter') || 'lowest'; // 'lowest', 'highest', 'all'
     const industry = searchParams.get('industry') || 'all';
     const limit = parseInt(searchParams.get('limit') || '100');
-    const username = searchParams.get('username'); // For percentile calculation
+    // username parameter available for future percentile calculations
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const username = searchParams.get('username');
 
     // Get total count for percentile calculations
     const { count: totalCount } = await supabase
