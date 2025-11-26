@@ -193,9 +193,9 @@ export default function LeaderboardPage() {
                       : 'border-white/10 hover:border-white/20'
                   }`}
                 >
-                  <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex items-start gap-2 sm:gap-4">
                     {/* Rank with medal */}
-                    <div className={`font-mono text-xl sm:text-2xl font-bold transition w-10 sm:w-12 flex-shrink-0 text-center ${
+                    <div className={`font-mono text-lg sm:text-2xl font-bold transition w-8 sm:w-12 flex-shrink-0 text-center pt-1 ${
                       isTopThree ? 'text-foreground' : 'text-secondary group-hover:text-foreground'
                     }`}>
                       {getRankMedal(rank)}
@@ -213,39 +213,39 @@ export default function LeaderboardPage() {
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-bold ${isTopThree ? 'text-base sm:text-lg' : 'text-sm sm:text-base'} text-foreground truncate`}>
+                    <div className="flex-1 min-w-0 pr-2">
+                      <p className={`font-bold ${isTopThree ? 'text-sm sm:text-lg' : 'text-xs sm:text-base'} text-foreground truncate leading-tight`}>
                         {entry.displayName}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <p className="font-mono text-sm text-secondary">@{entry.username}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <p className="font-mono text-xs sm:text-sm text-secondary truncate">@{entry.username}</p>
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             window.open(`https://x.com/${entry.username}`, '_blank', 'noopener,noreferrer');
                           }}
-                          className="text-white/60 hover:text-white transition-colors"
+                          className="text-white/60 hover:text-white transition-colors flex-shrink-0"
                           title="View on X"
                         >
-                          <span className="text-sm">𝕏</span>
+                          <span className="text-xs">𝕏</span>
                         </button>
                       </div>
                       {entry.industry && (
-                        <p className="text-xs text-secondary mt-1">{entry.industry}</p>
+                        <p className="text-xs text-secondary mt-0.5 truncate leading-tight">{entry.industry}</p>
                       )}
                     </div>
 
 
                     {/* Overall score - COLOR CODED */}
-                    <div className="text-right flex-shrink-0">
-                      <div className={`font-mono text-3xl sm:text-4xl font-black ${getScoreColor(entry.overallScore)}`}>
+                    <div className="text-right flex-shrink-0 min-w-[80px] sm:min-w-[100px]">
+                      <div className={`font-mono text-3xl sm:text-4xl font-black leading-none ${getScoreColor(entry.overallScore)}`}>
                         {entry.overallScore}
                       </div>
-                      <p className="font-mono text-xs text-secondary mt-1 whitespace-nowrap">
+                      <p className="font-mono text-[10px] sm:text-xs text-secondary mt-1 whitespace-nowrap leading-tight">
                         {entry.tierEmoji} {entry.tier}
                       </p>
-                      <p className="font-mono text-xs text-white/60 mt-1 whitespace-nowrap">
+                      <p className="font-mono text-[10px] sm:text-xs text-white/60 mt-0.5 whitespace-nowrap leading-tight">
                         Top {100 - entry.percentile}%
                       </p>
                     </div>
