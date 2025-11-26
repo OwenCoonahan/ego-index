@@ -187,34 +187,34 @@ export default function LeaderboardPage() {
                 <Link
                   key={entry.username}
                   href={`/analyze/${entry.username}`}
-                  className={`block bg-white/[0.04] backdrop-blur-sm border rounded-xl p-6 transition-smooth group hover:bg-white/[0.06] active:scale-[0.99] ${
+                  className={`block bg-white/[0.04] backdrop-blur-sm border rounded-xl p-4 sm:p-6 transition-smooth group hover:bg-white/[0.06] active:scale-[0.99] ${
                     isTopThree
                       ? 'border-white/20 hover:border-white/30 hover:shadow-glow'
                       : 'border-white/10 hover:border-white/20'
                   }`}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     {/* Rank with medal */}
-                    <div className={`font-mono text-2xl font-bold transition w-12 text-center ${
+                    <div className={`font-mono text-xl sm:text-2xl font-bold transition w-10 sm:w-12 flex-shrink-0 text-center ${
                       isTopThree ? 'text-foreground' : 'text-secondary group-hover:text-foreground'
                     }`}>
                       {getRankMedal(rank)}
                     </div>
 
                     {/* Profile pic */}
-                    <div className="relative group-hover:scale-105 transition-smooth">
+                    <div className="relative group-hover:scale-105 transition-smooth flex-shrink-0">
                       <Image
                         src={entry.profileImageUrl}
                         alt={entry.displayName}
-                        width={56}
-                        height={56}
-                        className="rounded-full border-2 border-white/20 group-hover:border-white/30"
+                        width={48}
+                        height={48}
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-white/20 group-hover:border-white/30"
                       />
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1">
-                      <p className={`font-bold ${isTopThree ? 'text-lg' : 'text-base'} text-foreground`}>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-bold ${isTopThree ? 'text-base sm:text-lg' : 'text-sm sm:text-base'} text-foreground truncate`}>
                         {entry.displayName}
                       </p>
                       <div className="flex items-center gap-2">
@@ -238,14 +238,14 @@ export default function LeaderboardPage() {
 
 
                     {/* Overall score - COLOR CODED */}
-                    <div className="text-right">
-                      <div className={`font-mono text-4xl font-black ${getScoreColor(entry.overallScore)}`}>
+                    <div className="text-right flex-shrink-0">
+                      <div className={`font-mono text-3xl sm:text-4xl font-black ${getScoreColor(entry.overallScore)}`}>
                         {entry.overallScore}
                       </div>
                       <p className="font-mono text-xs text-secondary mt-1 whitespace-nowrap">
                         {entry.tierEmoji} {entry.tier}
                       </p>
-                      <p className="font-mono text-xs text-white/60 mt-1">
+                      <p className="font-mono text-xs text-white/60 mt-1 whitespace-nowrap">
                         Top {100 - entry.percentile}%
                       </p>
                     </div>
