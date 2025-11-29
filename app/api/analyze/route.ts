@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Clean username
-    const cleanUsername = username.replace('@', '').trim();
+    // Clean username - lowercase for database consistency
+    const cleanUsername = username.replace('@', '').trim().toLowerCase();
 
     // Check if we have a recent analysis (within last 24 hours)
     const { data: existingProfile } = await supabaseAdmin
@@ -103,12 +103,12 @@ export async function GET(request: NextRequest) {
     const analysis = await analyzeEgo(twitterData.profile, originalTweets);
 
     // Save to database
-    // First, upsert the profile
+    // First, upsert the profile (use cleanUsername for consistency)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .upsert({
-        username: twitterData.profile.username,
+        username: cleanUsername,
         display_name: twitterData.profile.display_name,
         bio: twitterData.profile.bio,
         profile_image_url: twitterData.profile.profile_image_url,
@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
     // Return the result
     return NextResponse.json({
       profile: {
-        username: twitterData.profile.username,
+        username: cleanUsername,
         displayName: twitterData.profile.display_name,
         profileImageUrl: twitterData.profile.profile_image_url,
         bio: twitterData.profile.bio,
