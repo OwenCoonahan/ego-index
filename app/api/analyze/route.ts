@@ -121,6 +121,7 @@ export async function GET(request: NextRequest) {
 
     if (profileError) {
       console.error('Error saving profile:', profileError);
+      // Continue anyway - we'll still return the analysis even if DB save fails
     }
 
     // Then save the analysis
@@ -155,7 +156,15 @@ export async function GET(request: NextRequest) {
 
       if (analysisError) {
         console.error('Error saving analysis:', analysisError);
+        // Log detailed error info for debugging
+        console.error('Analysis data that failed to save:', {
+          username: twitterData.profile.username,
+          profile_id: (profile as any).id,
+          overall_score: analysis.overallScore,
+        });
       }
+    } else {
+      console.error('Profile save failed, cannot save analysis for:', twitterData.profile.username);
     }
 
     // Return the result
