@@ -12,11 +12,27 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const username = searchParams.get('username');
 
-    // Get total count for percentile calculations
-    const { count: totalCount } = await supabase
+    // Get latest analysis for each profile using a subquery approach
+    // First, get the latest analysis ID for each profile
+    const { data: latestAnalyses } = await supabase
       .from('analyses')
-      .select('*', { count: 'exact', head: true });
+      .select('profile_id, id, created_at')
+      .order('created_at', { ascending: false });
 
+    // Group by profile_id to get only the latest analysis per profile
+    const latestByProfile = new Map();
+    latestAnalyses?.forEach((analysis: any) => {
+      if (!latestByProfile.has(analysis.profile_id)) {
+        latestByProfile.set(analysis.profile_id, analysis.id);
+      }
+    });
+
+    const latestAnalysisIds = Array.from(latestByProfile.values());
+
+    // Get total count of unique profiles
+    const totalCount = latestAnalysisIds.length;
+
+    // Now query only these latest analyses
     let query = supabase
       .from('analyses')
       .select(`
@@ -36,6 +52,7 @@ export async function GET(request: NextRequest) {
           profile_image_url
         )
       `)
+      .in('id', latestAnalysisIds)
       .limit(limit);
 
     // Apply industry filter with fuzzy matching for grouped categories
@@ -86,9 +103,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all scores for percentile calculation (lower score = better)
+    // Only include latest analyses for each profile
     const { data: allScores } = await supabase
       .from('analyses')
       .select('overall_score')
+      .in('id', latestAnalysisIds)
       .order('overall_score', { ascending: true });
 
     const scores = allScores?.map((s: any) => s.overall_score) || [];
